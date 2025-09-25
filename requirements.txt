@@ -1,0 +1,4 @@
+fastapi
+uvicorn
+requests
+neo4j
