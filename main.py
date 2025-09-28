@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import requests
 import json
@@ -143,7 +144,10 @@ def generate_text(prompt: Prompt):
     results = run_cypher(cypher_query)
     return {"cypher": cypher_query, "results": results}
 
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
 # Run app
 if __name__ == "__main__":
     import uvicorn
+    
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)
