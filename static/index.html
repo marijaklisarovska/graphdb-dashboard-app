@@ -3,30 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>Neo4j Query Generator</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Neo4j Natural Language Query</h1>
-    <input type="text" id="prompt" placeholder="Ask a question about countries..." size="50"/>
-    <button onclick="sendPrompt()">Generate Cypher</button>
+    <div class="sidebar">
+        <h1>Neo4j Natural Language Query</h1>
+        <input type="text" id="prompt" placeholder="Ask a question about countries..." />
+        <button onclick="sendPrompt()">Generate Cypher</button>
 
-    <h2>Generated Cypher</h2>
-    <pre id="cypher"></pre>
+        <h3>Generated Cypher</h3>
+        <pre id="cypher"></pre>
 
-    <h2>Results</h2>
-    <pre id="results"></pre>
+        <h3>Raw Results</h3>
+        <pre id="results"></pre>
+    </div>
 
-    <script>
-        async function sendPrompt() {
-            const prompt = document.getElementById('prompt').value;
-            const response = await fetch('/generate', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({prompt: prompt})
-            });
-            const data = await response.json();
-            document.getElementById('cypher').textContent = data.cypher;
-            document.getElementById('results').textContent = JSON.stringify(data.results, null, 2);
-        }
-    </script>
+    <div class="main-content">
+        <div id="overlay" class="overlay" style="display: none;">
+            <div class="loader"></div>
+        </div>
+
+        <h2>Visualization Area</h2>
+        <!-- TODO: Add charts here -->
+        <div id="chartContainer" style="width:100%; height:400px; background-color:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+            <span>Chart will appear here</span>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
 </body>
 </html>
