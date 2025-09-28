@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import requests
 import json
@@ -11,8 +12,7 @@ from dotenv import load_dotenv
 import re
 
 app = FastAPI()
-
-dotenv_path = os.path.join(os.path.dirname(__file__), ".env")  # always points to same folder as main.py
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
 # Neo4j setup
@@ -36,20 +36,6 @@ Relationships:
 # Core
 (:Country)-[:BELONGS_TO]->(:Region)
 (:Country)-[:HAS_HAPPINESS_DATA {happiness_score, happiness_rank, gdp_per_capita, social_support, healthy_life_expectancy, freedom_to_make_life_choices, generosity, perceptions_of_corruption}]->(:Year)
-
-# Performance
-(:Country)-[:EXCELS_IN {year, value, percentile}]->(:MetricCategory)
-(:Country)-[:STRUGGLES_WITH {year, value, percentile}]->(:MetricCategory)
-(:Country)-[:BELONGS_TO_TIER {year}]->(:HappinessTier)
-
-# Temporal
-(:Country)-[:IMPROVED_FROM {from_year, to_year, score_change, rank_change}]->(:Year)
-(:Country)-[:DECLINED_FROM {from_year, to_year, score_change, rank_change}]->(:Year)
-
-# Comparative
-(:Country)-[:SIMILAR_TO {year, score_difference}]->(:Country)
-(:Country)-[:ABOVE_REGIONAL_AVERAGE {metric, year, country_value, regional_average, difference}]->(:Region)
-(:Country)-[:BELOW_REGIONAL_AVERAGE {metric, year, country_value, regional_average, difference}]->(:Region)
 """
 
 # Serialization for Neo4j
@@ -163,4 +149,4 @@ app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)
-    
+
