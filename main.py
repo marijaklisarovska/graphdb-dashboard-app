@@ -5,29 +5,52 @@ import json
 import os
 from neo4j import GraphDatabase
 from neo4j.graph import Node, Relationship, Path
+from dotenv import load_dotenv
 
 app = FastAPI()
 
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")  # always points to same folder as main.py
+load_dotenv(dotenv_path)
+
 # Neo4j setup
-NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
-NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "dbmsmarija")
+NEO4J_URI = os.getenv("NEO4J_URI")
+NEO4J_USER = os.getenv("NEO4J_USER")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+
+print("NEO4J_URI:", os.getenv("NEO4J_URI"))
+print("NEO4J_USER:", os.getenv("NEO4J_USER"))
+print("NEO4J_PASSWORD:", os.getenv("NEO4J_PASSWORD"))
 
 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
 
 class Prompt(BaseModel):
     prompt: str
 
-NBA_SCHEMA = """
-(:PLAYER{name, number, weight, age, height, salary, rebounds, assists, minutes, turnovers, points})
-(:TEAM{name})
-(:COACH{name})
+COUNTRIES_HAPPINESS_SCHEMA = """
+(:Country{name})
+(:Region{name})
+(:Year{year})
+(:MetricCategory{name})
+(:HappinessTier{name})
+
 Relationships:
-(:PLAYER)-[:PLAYS_FOR]->(:TEAM)
-(:PLAYER)-[:PLAYED_AGAINST {points}]->(:TEAM)
-(:PLAYER)-[:TEAMMATES]->(:PLAYER)
-(:COACH)-[:COACHES_FOR]->(:TEAM)
-(:COACH)-[:COACHES]->(:PLAYER)
+# Core
+(:Country)-[:BELONGS_TO]->(:Region)
+(:Country)-[:HAS_HAPPINESS_DATA {happiness_score, happiness_rank, gdp_per_capita, social_support, healthy_life_expectancy, freedom_to_make_life_choices, generosity, perceptions_of_corruption}]->(:Year)
+
+# Performance
+(:Country)-[:EXCELS_IN {year, value, percentile}]->(:MetricCategory)
+(:Country)-[:STRUGGLES_WITH {year, value, percentile}]->(:MetricCategory)
+(:Country)-[:BELONGS_TO_TIER {year}]->(:HappinessTier)
+
+# Temporal
+(:Country)-[:IMPROVED_FROM {from_year, to_year, score_change, rank_change}]->(:Year)
+(:Country)-[:DECLINED_FROM {from_year, to_year, score_change, rank_change}]->(:Year)
+
+# Comparative
+(:Country)-[:SIMILAR_TO {year, score_difference}]->(:Country)
+(:Country)-[:ABOVE_REGIONAL_AVERAGE {metric, year, country_value, regional_average, difference}]->(:Region)
+(:Country)-[:BELOW_REGIONAL_AVERAGE {metric, year, country_value, regional_average, difference}]->(:Region)
 """
 
 # Clean up JSON response
@@ -61,7 +84,7 @@ def serialize(value):
 # Neo4j query run
 def run_cypher(query: str):
     results = []
-    with driver.session(database="nbatest") as session:
+    with driver.session() as session:
         for record in session.run(query):
             row = {}
             for key, value in record.items():
@@ -81,7 +104,7 @@ def query_ollama(prompt_text: str) -> str:
     instruction = f"""
 You are an assistant that translates natural language questions into Cypher queries.
 Use the schema below. Return only the Cypher query.
-{NBA_SCHEMA}
+{COUNTRIES_HAPPINESS_SCHEMA}
 Question: {prompt_text}
 """
     try:
