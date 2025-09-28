@@ -5,13 +5,15 @@ This FastAPI application integrates the World Happiness Report database, convert
 
 ## Technical Specifications
 Backend:
-- Python 3.12
-- FastAPI
-- Neo4j
+- FastAPI (Python)
+- Neo4j (graph database)
+- Ollama LLM (interprets natural language queries into Cypher)
+- Python libraries: requests, pydantic, dotenv, ...
 
 Frontend:
 - HTML / CSS / JavaScript
-- Chart.js
+- Chart.js (data visualizations)
+- Fetch API (communicates with FastAPI)
 
 
 ## Installation
