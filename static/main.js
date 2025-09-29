@@ -408,19 +408,67 @@ function createDataTable(results) {
 function clearVisualizations() {
     charts.forEach(chart => chart.destroy());
     charts = [];
-    document.getElementById('chartWrapper').innerHTML = '';
-    document.getElementById('dataTableContainer').innerHTML = '';
+    
+    const chartWrapper = document.getElementById('chartWrapper');
+    if (chartWrapper) {
+        chartWrapper.innerHTML = '';
+        chartWrapper.style.display = 'none';
+    }
+    
+    const dataTableContainer = document.getElementById('dataTableContainer');
+    if (dataTableContainer) {
+        dataTableContainer.innerHTML = '';
+    }
+    
+    const messageElement = document.getElementById('messageElement');
+    if (messageElement) messageElement.style.display = 'none';
+    
+    const errorElement = document.getElementById('errorElement');
+    if (errorElement) errorElement.style.display = 'none';
+    
+    const dataTableSection = document.getElementById('dataTableSection');
+    if (dataTableSection) dataTableSection.style.display = 'block';
 }
 
 function showMessage(message) {
     const visualizationArea = document.getElementById('visualizationArea');
-    visualizationArea.innerHTML = `<div class="placeholder">${message}</div>`;
+    const chartWrapper = document.getElementById('chartWrapper');
+    const dataTableSection = document.getElementById('dataTableSection');
+    
+    if (chartWrapper) chartWrapper.style.display = 'none';
+    if (dataTableSection) dataTableSection.style.display = 'none';
+    
+    let messageElement = document.getElementById('messageElement');
+    if (!messageElement) {
+        messageElement = document.createElement('div');
+        messageElement.id = 'messageElement';
+        messageElement.className = 'placeholder';
+        visualizationArea.insertBefore(messageElement, visualizationArea.firstChild);
+    }
+    
+    messageElement.innerHTML = message;
+    messageElement.style.display = 'block';
     visualizationArea.style.display = 'block';
 }
 
 function showError(message) {
     const visualizationArea = document.getElementById('visualizationArea');
-    visualizationArea.innerHTML = `<div class="placeholder error">${message}</div>`;
+    const chartWrapper = document.getElementById('chartWrapper');
+    const dataTableSection = document.getElementById('dataTableSection');
+    
+    if (chartWrapper) chartWrapper.style.display = 'none';
+    if (dataTableSection) dataTableSection.style.display = 'none';
+    
+    let errorElement = document.getElementById('errorElement');
+    if (!errorElement) {
+        errorElement = document.createElement('div');
+        errorElement.id = 'errorElement';
+        errorElement.className = 'placeholder error';
+        visualizationArea.insertBefore(errorElement, visualizationArea.firstChild);
+    }
+    
+    errorElement.innerHTML = message;
+    errorElement.style.display = 'block';
     visualizationArea.style.display = 'block';
 }
 
