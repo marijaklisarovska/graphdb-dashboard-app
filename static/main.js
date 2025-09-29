@@ -47,7 +47,8 @@ function processAndVisualizeData(results) {
         return;
     }
 
-    const detectedCharts = detectChartTypes(results);
+    const flattenedResults = flattenData(results);
+    const detectedCharts = detectChartTypes(flattenedResults);
     
     if (detectedCharts.length > 0) {
         createCharts(detectedCharts);
@@ -56,7 +57,7 @@ function processAndVisualizeData(results) {
         document.getElementById('chartWrapper').style.display = 'none';
     }
     
-    createDataTable(results);
+    createDataTable(flattenedResults);
 }
 
 function detectChartTypes(results) {
@@ -233,6 +234,60 @@ function analyzeFields(results) {
     });
 
     return { numericFields, stringFields, timeFields, categoricalFields };
+}
+
+function flattenData(results) {
+    if (!results || results.length === 0) return results;
+    
+    const firstItem = results[0];
+    const hasNestedObjects = Object.values(firstItem).some(value => 
+        value && typeof value === 'object' && !Array.isArray(value) && value !== null
+    );
+    
+    if (!hasNestedObjects) {
+        return results;
+    }
+    
+    console.log('Flattening nested data structure...');
+    
+    const usedFieldNames = new Set();
+    
+    return results.map(item => {
+        const flattened = {};
+        
+        Object.keys(item).forEach(key => {
+            const value = item[key];
+            
+            if (value && typeof value === 'object' && !Array.isArray(value)) {
+                if (value.properties && typeof value.properties === 'object') {
+                    Object.keys(value.properties).forEach(propKey => {
+                        flattened[propKey] = value.properties[propKey];
+                        usedFieldNames.add(propKey);
+                    });
+                }
+                
+                Object.keys(value).forEach(nestedKey => {
+                    if (nestedKey !== 'properties' && 
+                        typeof value[nestedKey] !== 'object' && 
+                        value[nestedKey] !== null) {
+                        
+                        if (!usedFieldNames.has(nestedKey)) {
+                            flattened[nestedKey] = value[nestedKey];
+                        }
+                    }
+                });
+                
+                if (Array.isArray(value.labels) && value.labels.length > 0) {
+                    const mainLabel = value.labels[0].toLowerCase();
+                    flattened[`${mainLabel}_type`] = value.labels[0];
+                }
+            } else {
+                flattened[key] = value;
+            }
+        });
+        
+        return flattened;
+    });
 }
 
 function isYearField(key, values) {
