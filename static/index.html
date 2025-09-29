@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Neo4j Query Generator</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/static/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -26,16 +26,17 @@
 
     <h2>Visualization Area</h2>
 
-    <div id="chartWrapper">
-      <div class="chart-card">
-        <div class="chart-container">
-          <canvas id="chart1"></canvas>
-        </div>
+    <div id="initialPlaceholder" class="placeholder">
+      <p>Charts will appear here after generating a query</p>
+    </div>
+
+    <div id="visualizationArea" style="display: none;">
+      <div id="chartWrapper">
       </div>
       
-      <div class="chart-card">
-        <div class="chart-container">
-          <canvas id="chart2"></canvas>
+      <div id="dataTableSection">
+        <h3>Data Table</h3>
+        <div id="dataTableContainer">
         </div>
       </div>
     </div>
