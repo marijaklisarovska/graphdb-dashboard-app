@@ -2,6 +2,11 @@
 
 This FastAPI application integrates the World Happiness Report database, converted in Neo4j, and the Ollama LLM to interpret user questions as Cypher queries, and visualizes them with Chart.js.
 
+## App description
+
+The World Happiness Report is a landmark survey of the state of global happiness. The happiness scores and rankings of each country are based on answers to the life evaluation questions asked in the Gallup World Poll. The dataset is originally tabular, therefore for this project converted into a graph dataset by defining a schema of nodes, relationships and properties and loaded in Neo4J.
+
+**How the app works:** The user asks a question about the countries. This question in the background is sent as a prompt, along with the database schema, to a local Ollama3 model which processes it and accordingly generates a Cypher query. The query executes in Neo4J and the results are returned in JSON. The results are then visualized into a chart or a diagram by Chart.js.
 
 ## Technical Specifications
 Backend:
